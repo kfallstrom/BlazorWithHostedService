@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace BlazorWithHostedService.Models
 {
-    public class GetQuoteModel:TaskFromUser
+    public abstract class TaskFromUser
     {
-        public string QuoteId { get; set; }
-        public string Name { get; set; }
+        public string ConnectionId { get; set; }
     }
 }

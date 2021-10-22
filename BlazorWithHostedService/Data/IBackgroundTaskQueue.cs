@@ -17,7 +17,6 @@ namespace BlazorWithHostedService.Data
 
     public class BackgroundTaskQueue : IBackgroundTaskQueue
     {
-        private readonly Channel<Func<CancellationToken, ValueTask>> _queue;
         private readonly Channel<GetQuoteModel> _quotequeue;
 
         public BackgroundTaskQueue(int capacity)
@@ -31,7 +30,6 @@ namespace BlazorWithHostedService.Data
             {
                 FullMode = BoundedChannelFullMode.Wait,
             };
-            _queue = Channel.CreateBounded<Func<CancellationToken, ValueTask>>(options);
             _quotequeue = Channel.CreateBounded<GetQuoteModel>(options);
         }
 

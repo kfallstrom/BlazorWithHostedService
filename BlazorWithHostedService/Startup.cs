@@ -1,4 +1,6 @@
+using Azure.Storage.Blobs;
 using BlazorWithHostedService.Data;
+using BlazorWithHostedService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -29,6 +31,7 @@ namespace BlazorWithHostedService
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<IBlobQuoteClient,BlobQuoteClient>();
             services.AddHostedService<CacheWorker>();
             services.AddSingleton<IBackgroundTaskQueue>(ctx =>
             {

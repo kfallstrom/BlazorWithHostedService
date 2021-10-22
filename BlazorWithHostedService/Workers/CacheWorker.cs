@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using BlazorWithHostedService.Services;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,10 +16,11 @@ namespace BlazorWithHostedService.Data
     {
         private readonly ILogger<CacheWorker> _logger;
         public IBackgroundTaskQueue _taskQueue { get; }
-
-        public CacheWorker(IBackgroundTaskQueue taskQueue,
+        public IBlobQuoteClient _quoteClient;
+        public CacheWorker(IBackgroundTaskQueue taskQueue, IBlobQuoteClient quoteClient,
             ILogger<CacheWorker> logger)
         {
+            _quoteClient = quoteClient;
             _taskQueue = taskQueue;
             _logger = logger;
         }
@@ -39,6 +43,14 @@ namespace BlazorWithHostedService.Data
 
                 try
                 {
+                    using (var stream = new MemoryStream())
+                    {
+                        var payload = Encoding.UTF8.GetBytes($"{workItem.ConnectionId},{workItem.Name},{workItem.QuoteId}");
+
+                        await stream.WriteAsync(payload);
+                        stream.Position = 0;
+                        await _quoteClient.AddBlob(stream, workItem.QuoteId, workItem.Name);
+                    }
                     _logger.LogInformation(workItem.Name, workItem);
                 }
                 catch (Exception ex)

@@ -13,6 +13,6 @@
     private void IncrementCount()
     {
         currentCount++;
-        Queue.QueueBackgroundWorkItemAsync(new Models.GetQuoteModel { Id = "nasfda", Name = "THISNAMEISMADE" });
+        Queue.QueueBackgroundWorkItemAsync(new Models.GetQuoteModel { QuoteId = $"nasfda{currentCount}", Name = $"THISNAMEISMADE{currentCount}", ConnectionId = Guid.NewGuid().ToString("D") });
     }
 }
