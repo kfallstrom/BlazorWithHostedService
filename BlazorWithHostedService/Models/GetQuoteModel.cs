@@ -7,6 +7,7 @@ namespace BlazorWithHostedService.Models
 {
     public class GetQuoteModel:TaskFromUser
     {
+        public GetQuoteModel():base() { }
         public string QuoteId { get; set; }
         public string Name { get; set; }
     }

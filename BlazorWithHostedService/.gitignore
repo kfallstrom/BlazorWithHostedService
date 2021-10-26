@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/Bandwidth_Frontend/bin/Debug/net5.0
+/Bandwidth_Frontend/obj
+/BlazorWithHostedService/bin/Debug/net5.0
+/BlazorWithHostedService/obj
