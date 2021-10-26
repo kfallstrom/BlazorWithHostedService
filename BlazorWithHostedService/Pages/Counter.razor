@@ -1,18 +1,38 @@
 ﻿@page "/counter"
-@inject BlazorWithHostedService.Data.IBackgroundTaskQueue Queue 
+@inject BlazorWithHostedService.Data.IBackgroundMessageTaskQueue<BlazorWithHostedService.Models.GetQuoteModel> Queue
+@inject BlazorWithHostedService.Services.IHubConnectionProxy HubProxy
+@inject NavigationManager Manager;
 
 <h1>Counter</h1>
 
 <p>Current count: @currentCount</p>
-
+<p>Latest QuoteFile: @returnModel.TimeStamp</p>
+<p>FileName: @returnModel.FileName</p>
+<p>QuoteId: @returnModel.QuoteId</p>
+<p>Size: @returnModel.Size</p>
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
+    BlazorWithHostedService.Models.GetQuoteModelResponse returnModel = new();
+    public string _connectionId = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HubProxy.Build(Manager.ToAbsoluteUri("/blobuploaded").ToString());
+        HubProxy.On<BlazorWithHostedService.Models.GetQuoteModelResponse>("updateUI", (model) =>
+        {
+            returnModel = model;
+            StateHasChanged();
+        });
+        await HubProxy.StartAsync();
+        _connectionId = HubProxy.ConnectionId();
+    }
+
     private int currentCount = 0;
 
     private void IncrementCount()
     {
         currentCount++;
-        Queue.QueueBackgroundWorkItemAsync(new Models.GetQuoteModel { QuoteId = $"nasfda{currentCount}", Name = $"THISNAMEISMADE{currentCount}", ConnectionId = Guid.NewGuid().ToString("D") });
+        Queue.QueueBackgroundWorkItemAsync(new Models.GetQuoteModel { ConnectionId = _connectionId, QuoteId = $"nasfda{currentCount}", Name = $"THISNAMEISMADE{currentCount}" });
     }
 }

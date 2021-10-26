@@ -1,0 +1,18 @@
+﻿@page "/counter"
+@inject BlazorWithHostedService.Data.IBackgroundTaskQueue Queue 
+
+<h1>Counter</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+        Queue.QueueBackgroundWorkItemAsync(new Models.GetQuoteModel { QuoteId = $"nasfda{currentCount}", Name = $"THISNAMEISMADE{currentCount}", ConnectionId = Guid.NewGuid().ToString("D") });
+    }
+}
