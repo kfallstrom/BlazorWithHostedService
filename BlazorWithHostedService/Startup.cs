@@ -1,7 +1,5 @@
 using Azure.Storage.Blobs;
 using BlazorWithHostedService.Data;
-using BlazorWithHostedService.Hubs;
-using BlazorWithHostedService.Models;
 using BlazorWithHostedService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -32,12 +30,13 @@ namespace BlazorWithHostedService
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSignalR();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<IBlobQuoteClient,BlobQuoteClient>();
-            services.AddSingleton<IBackgroundMessageTaskQueue<GetQuoteModel>, GetQuoteTaskQueue>();
-            services.AddSingleton<IHubConnectionProxy, HubConnectionProxy>();
-            services.AddHostedService<QuoteBlobBackgroundService>();
+            services.AddHostedService<CacheWorker>();
+            services.AddSingleton<IBackgroundTaskQueue>(ctx =>
+            {
+                return new BackgroundTaskQueue(100);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,7 +61,6 @@ namespace BlazorWithHostedService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
-                endpoints.MapHub<BlobUploadedHub>("/blobuploaded");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
