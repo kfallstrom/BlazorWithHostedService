@@ -1,5 +1,7 @@
 using Azure.Storage.Blobs;
 using BlazorWithHostedService.Data;
+using BlazorWithHostedService.Hubs;
+using BlazorWithHostedService.Models;
 using BlazorWithHostedService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -32,7 +34,9 @@ namespace BlazorWithHostedService
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<IBlobQuoteClient,BlobQuoteClient>();
-            services.AddHostedService<CacheWorker>();
+            services.AddHostedService<QuoteBlobBackgroundService>();
+            services.AddScoped<IHubConnectionProxy, HubConnectionProxy>();
+            services.AddSingleton<IBackgroundMessageTaskQueue<GetQuoteModel>, GetQuoteTaskQueue>();
             services.AddSingleton<IBackgroundTaskQueue>(ctx =>
             {
                 return new BackgroundTaskQueue(100);
@@ -61,6 +65,8 @@ namespace BlazorWithHostedService
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapHub<BlobUploadedHub>("/blobuploaded");
+
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

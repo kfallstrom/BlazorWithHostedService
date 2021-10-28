@@ -50,10 +50,14 @@ namespace BlazorWithHostedService.Data
                     using (var stream = new MemoryStream())
                     {
                         var payload = Encoding.UTF8.GetBytes($"{workItem.ConnectionId},{workItem.Name},{workItem.QuoteId}");
-
-                        await stream.WriteAsync(payload);
+                        var rnd = new Random();
+                        for (var i = 0; i < rnd.Next(500,1000); i++)
+                        {
+                            await stream.WriteAsync(payload);
+                        }
                         stream.Position = 0;
                         var result = await _quoteClient.AddBlob(stream, workItem.QuoteId, workItem.Name);
+                        
                         result.ConnectionId = workItem.ConnectionId;
                         //using(var scope = _services.CreateScope())
                         //{
