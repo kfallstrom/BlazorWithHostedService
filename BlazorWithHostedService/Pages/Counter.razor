@@ -42,7 +42,7 @@
     protected override async Task OnInitializedAsync()
     {
         HubProxy.Build(Manager.ToAbsoluteUri("/blobuploaded").ToString());
-        HubProxy.On<BlazorWithHostedService.Models.GetQuoteModelResponse>("updateUI", (model) =>
+        HubProxy.On<BlazorWithHostedService.Models.GetQuoteModelResponse>("NotifyBlobSuccess", (model) =>
         {
             returnModel = model;
             ShowWaitingModal = false;

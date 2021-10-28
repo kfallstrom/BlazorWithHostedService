@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 
 namespace BlazorWithHostedService.Hubs
 {
-    public class BlobUploadedHub:Hub
+    public interface IBlobHub
+    {
+        Task NotifyBlobSuccess(GetQuoteModelResponse message);
+    }
+    public class BlobUploadedHub:Hub<IBlobHub>
     {
      
         public async Task NotifyBlobSuccess(GetQuoteModelResponse message )
         {
-            await Clients.All.SendAsync("updateUI",message);
+            await Clients.Client(message.ConnectionId).NotifyBlobSuccess(message);
         }
     }
 }

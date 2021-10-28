@@ -21,10 +21,12 @@ namespace BlazorWithHostedService.Data
         private readonly ILogger<QuoteBlobBackgroundService> _logger;
         public IBackgroundMessageTaskQueue<GetQuoteModel> _taskQueue { get; }
         public IBlobQuoteClient _quoteClient;
-        public IHubContext<BlobUploadedHub> _hubContext;
-        public QuoteBlobBackgroundService(IBackgroundMessageTaskQueue<GetQuoteModel> taskQueue, IBlobQuoteClient quoteClient, IHubContext<BlobUploadedHub> hubContext,
+        public IHubContext<BlobUploadedHub,IBlobHub> _hubContext;
+        public IServiceProvider _services;
+        public QuoteBlobBackgroundService(IBackgroundMessageTaskQueue<GetQuoteModel> taskQueue, IBlobQuoteClient quoteClient, IServiceProvider serviceProvider,IHubContext<BlobUploadedHub, IBlobHub> hubContext,
             ILogger<QuoteBlobBackgroundService> logger)
         {
+            _services = serviceProvider;
             _hubContext = hubContext;
             _quoteClient = quoteClient;
             _taskQueue = taskQueue;
@@ -59,12 +61,8 @@ namespace BlazorWithHostedService.Data
                         var result = await _quoteClient.AddBlob(stream, workItem.QuoteId, workItem.Name);
                         
                         result.ConnectionId = workItem.ConnectionId;
-                        //using(var scope = _services.CreateScope())
-                        //{
-                        //    var hub = scope.ServiceProvider.GetRequiredService<BlobUploadedHub>();
-                        //    await hub.NotifyBlobSuccess(result);
-                        //}
-                        await _hubContext.Clients.All.SendAsync("updateUI", result);
+                        await _hubContext.Clients.All.NotifyBlobSuccess(result);
+                        
                     }
                     _logger.LogInformation(workItem.Name, workItem);
                 }
