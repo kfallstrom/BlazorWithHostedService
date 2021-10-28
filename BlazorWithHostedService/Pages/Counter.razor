@@ -4,7 +4,25 @@
 @inject NavigationManager Manager;
 
 <h1>Counter</h1>
-
+@if (ShowWaitingModal)
+{
+    <div id="demomodal" class="modal fade show " tabindex="-1" role="dialog" style="display:block">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Please Wait</h2>
+                </div>
+                <div class="modal-body text-md-center">
+                    <i class="fa fa-spinner fa-4x spin" aria-hidden="true"></i>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => CloseModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
 <p>Current count: @currentCount</p>
 <p>Latest QuoteFile: @returnModel.TimeStamp</p>
 <p>FileName: @returnModel.FileName</p>
@@ -12,16 +30,22 @@
 <p>Size: @returnModel.Size</p>
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+
 @code {
     BlazorWithHostedService.Models.GetQuoteModelResponse returnModel = new();
     public string _connectionId = string.Empty;
-
+    private bool ShowWaitingModal = false;
+    private void CloseModal()
+    {
+        ShowWaitingModal = !ShowWaitingModal;
+    }
     protected override async Task OnInitializedAsync()
     {
         HubProxy.Build(Manager.ToAbsoluteUri("/blobuploaded").ToString());
         HubProxy.On<BlazorWithHostedService.Models.GetQuoteModelResponse>("updateUI", (model) =>
         {
             returnModel = model;
+            ShowWaitingModal = false;
             StateHasChanged();
         });
         await HubProxy.StartAsync();
@@ -33,6 +57,8 @@
     private void IncrementCount()
     {
         currentCount++;
+        ShowWaitingModal = true;
+        StateHasChanged();
         Queue.QueueBackgroundWorkItemAsync(new Models.GetQuoteModel { ConnectionId = _connectionId, QuoteId = $"nasfda{currentCount}", Name = $"THISNAMEISMADE{currentCount}" });
     }
 }
