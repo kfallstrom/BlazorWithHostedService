@@ -53,7 +53,7 @@ namespace BlazorWithHostedService.Data
                     {
                         var payload = Encoding.UTF8.GetBytes($"{workItem.ConnectionId},{workItem.Name},{workItem.QuoteId}");
                         var rnd = new Random();
-                        for (var i = 0; i < rnd.Next(5000,10000); i++)
+                        for (var i = 0; i < rnd.Next(50000,100000); i++)
                         {
                             await stream.WriteAsync(payload);
                         }

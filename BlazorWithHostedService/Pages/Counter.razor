@@ -1,6 +1,9 @@
 ﻿@page "/counter"
-@inject BlazorWithHostedService.Data.IBackgroundMessageTaskQueue<BlazorWithHostedService.Models.GetQuoteModel> Queue
-@inject BlazorWithHostedService.Services.IHubConnectionProxy HubProxy
+@using BlazorWithHostedService.Data
+@using BlazorWithHostedService.Services
+@using BlazorWithHostedService.Models
+@inject IBackgroundMessageTaskQueue<GetQuoteModel> Queue
+@inject IHubConnectionProxy HubProxy
 @inject NavigationManager Manager;
 
 <h1>Counter</h1>
@@ -13,7 +16,7 @@
                     <h2 class="modal-title">Please Wait</h2>
                 </div>
                 <div class="modal-body text-md-center">
-                    <i class="fa fa-spinner fa-4x spin" aria-hidden="true"></i>
+                    <i class="fa fa-spinner fa-4x fa-spin" aria-hidden="true"></i>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => CloseModal()">Close</button>
